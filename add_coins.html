@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wallet Add Money</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+  <style>
+    body { font-family: 'Poppins', sans-serif; text-align: center; background-color: #111; color: white; }
+    .container { padding: 20px; }
+    .payment-option { margin: 10px 0; padding: 10px; background-color: #1e293b; border-radius: 10px; cursor: pointer; }
+    #qrCode { margin: 20px auto; }
+  </style>
+</head>
+<body>
+
+  <h1>🔥 Fire Battle Wallet 🔥</h1>
+  <h2>Wallet Balance: ₹<span id="walletBalance">0</span></h2>
+  <input type="number" id="amount" placeholder="Enter Amount" min="10" />
+  
+  <h3>Select Payment Method:</h3>
+  <div class="payment-option" onclick="selectPayment('PhonePe')">📲 PhonePe</div>
+  <div class="payment-option" onclick="selectPayment('Google Pay')">💳 Google Pay</div>
+  <div class="payment-option" onclick="selectPayment('Paytm')">💵 Paytm</div>
+  
+  <button onclick="proceedToPay()">Proceed to Pay</button>
+
+  <div id="qrCode"></div>
+
+<script>
+  let selectedPayment = "";
+  let transactionID = "";
+
+  // Google Sheet API URL
+  const sheetAPI = "https://script.google.com/macros/s/AKfycbxD06Yp2uN4VC1Yp1G7A-vU5VxkJwklVqfRf8UTHEoiuV-JUG8V62BeuM-VAxBXqSKJ/exec";
+
+  // Fetch Current Wallet Balance from Google Sheets
+  async function fetchWalletBalance() {
+    const response = await fetch(${sheetAPI}?action=getBalance&username=Shivanshu);
+    const data = await response.json();
+    document.getElementById('walletBalance').textContent = data.balance;
+  }
+
+  // Select Payment Option
+  function selectPayment(method) {
+    selectedPayment = method;
+    alert(method + " Selected!");
+  }
+
+  // Generate Transaction ID
+  function generateTransactionID() {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    transactionID = '';
+    for (let i = 0; i < 10; i++) {
+      transactionID += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+  }
+
+  // Proceed to Pay Function
+  async function proceedToPay() {
+    const amount = document.getElementById('amount').value;
+    if (!amount || amount < 10 || !selectedPayment) {
+      alert('Please Enter Amount and Select Payment Method');
+      return;
+    }
+
+    generateTransactionID();
+
+    // Generate QR Code
+    const upiID = "yourupi@paytm"; // Replace with your UPI ID
+    const qrData = upi://pay?pa=${upiID}&pn=FireBattle&mc=&tid=${transactionID}&tr=${transactionID}&tn=Adding Money&am=${amount}&cu=INR;
+    new QRCode(document.getElementById("qrCode"), { text: qrData, width: 200, height: 200 });
+
+    // Add Payment Data to Google Sheets
+    await fetch(sheetAPI, {
+      method: "POST",
+      body: new URLSearchParams({
+        action: "addMoney",
+        username: "Shivanshu",
+        amount: amount,
+        paymentMethod: selectedPayment,
+        transactionID: transactionID
+      })
+    });
+
+    // Wallet Balance Auto Update
+    setTimeout(fetchWalletBalance, 5000);
+  }
+
+  // On Page Load, Fetch Current Balance
+  fetchWalletBalance();
+</script>
+
+</body>
+</html>
