@@ -9,6 +9,7 @@
     body { font-family: 'Poppins', sans-serif; text-align: center; background-color: #111; color: white; }
     .container { padding: 20px; }
     .payment-option { margin: 10px 0; padding: 10px; background-color: #1e293b; border-radius: 10px; cursor: pointer; }
+    .selected { background-color: #f39c12; color: black; }
     #qrCode { margin: 20px auto; }
   </style>
 </head>
@@ -19,9 +20,9 @@
   <input type="number" id="amount" placeholder="Enter Amount" min="10" />
   
   <h3>Select Payment Method:</h3>
-  <div class="payment-option" onclick="selectPayment('PhonePe')">📲 PhonePe</div>
-  <div class="payment-option" onclick="selectPayment('Google Pay')">💳 Google Pay</div>
-  <div class="payment-option" onclick="selectPayment('Paytm')">💵 Paytm</div>
+  <div class="payment-option" id="phonepe" onclick="selectPayment('PhonePe')">📲 PhonePe</div>
+  <div class="payment-option" id="gpay" onclick="selectPayment('Google Pay')">💳 Google Pay</div>
+  <div class="payment-option" id="paytm" onclick="selectPayment('Paytm')">💵 Paytm</div>
   
   <button onclick="proceedToPay()">Proceed to Pay</button>
 
@@ -44,7 +45,16 @@
   // Select Payment Option
   function selectPayment(method) {
     selectedPayment = method;
-    alert(method + " Selected!");
+
+    // Remove previous selection
+    document.querySelectorAll(".payment-option").forEach(option => {
+      option.classList.remove('selected');
+    });
+
+    // Add selected class
+    if (method === 'PhonePe') document.getElementById('phonepe').classList.add('selected');
+    if (method === 'Google Pay') document.getElementById('gpay').classList.add('selected');
+    if (method === 'Paytm') document.getElementById('paytm').classList.add('selected');
   }
 
   // Generate Transaction ID
@@ -67,7 +77,7 @@
     generateTransactionID();
 
     // Generate QR Code
-    const upiID = "yourupi@paytm"; // Replace with your UPI ID
+    const upiID = "7067629527@ybl"; // Replace with your UPI ID
     const qrData = upi://pay?pa=${upiID}&pn=FireBattle&mc=&tid=${transactionID}&tr=${transactionID}&tn=Adding Money&am=${amount}&cu=INR;
     new QRCode(document.getElementById("qrCode"), { text: qrData, width: 200, height: 200 });
 
