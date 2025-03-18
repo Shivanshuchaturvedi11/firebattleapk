@@ -63,7 +63,7 @@
 
     async function fetchUpiDetails() {
         showLoader();
-        const response = await fetch("https://script.google.com/macros/s/AKfycbwUnMnkWnEa0fJXQj0os4ugq91aKUbQIrwHwGBFjS3gut5BYQypcNRYx9xn83l5MqNi/exec?getUpiID=true");
+        const response = await fetch("https://script.google.com/macros/s/AKfycbxk-9ctFI2NjPAhyRjdrJedSTZ7SiccHhh6Jj2R8FoQmAPShVNx_LSy92D7nVstZgJG/exec?getUpiID=true");
         const data = await response.json();
         upiID = data.upi;
         merchantName = data.merchantName;
